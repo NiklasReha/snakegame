@@ -40,7 +40,7 @@ fn main() {
     
     //Fängt getätigte Inputs ab
     let _child_handle = thread::spawn(move|| {
-        let mut direction_thread = MoveDirection{vec_y:0,vec_x:0};
+        let mut direction_thread = MoveDirection{vec_y:0,vec_x:-1};
         
         //Gameloop    
         loop{
