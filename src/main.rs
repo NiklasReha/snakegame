@@ -13,12 +13,15 @@ use std::io::{Write};
 use win32console::console::WinConsole;
 
 fn main() {
-
+loop{
 //Abfrage der Spielfeldparameter un initalisieren des Feldes
     let _clean_up = CleanUp;
     let weite =20;
     let hoehe = 20;
     let mut playingfield:Vec<Vec<i32>> = Vec::new();
+    println!("Press ENTER to start");
+    let mut buf = [0; 1];
+    io::stdin().read(&mut buf).expect("Failed to read line");
 
     for i in 0..hoehe+2{
         playingfield.push(Vec::new());
@@ -37,6 +40,7 @@ fn main() {
     terminal::enable_raw_mode().expect("Could not turn on Raw mode");
     let (s, r) = unbounded::<Result<MoveDirection, MoveDirection>>();
     let (s2, r2) = unbounded::<Result<bool, bool>>();
+    let (s3, r3) = unbounded::<Result<bool, bool>>();
     
     //Fängt getätigte Inputs ab
     let _child_handle = thread::spawn(move|| {
@@ -46,6 +50,16 @@ fn main() {
         loop{
             let mut buf = [0; 1];
             std.read(&mut buf).expect("Failed to read line");
+            match r2.try_recv(){
+                Ok(x)=>{
+                    match x{
+                        Ok(z)=>{if z{
+                            s3.send(Ok(buf[0] as char =='y'));
+                            break}},
+                        Err(_u)=>{}
+                    }},
+                Err(_d)=>{}
+            };       
             if buf[0] as char =='w' && direction_thread.vec_y !=1 {
                 direction_thread.vec_x=0;
                 direction_thread.vec_y=-1;
@@ -69,16 +83,6 @@ fn main() {
                 std::process::exit(0);
             }  
             s.send(Ok(direction_thread.clone())).unwrap();
-            match r2.try_recv(){
-                Ok(x)=>{
-                    match x{
-                        Ok(z)=>{if z{
-                            println!("Shutting down thread...");
-                            return}},
-                        Err(_u)=>{}
-                    }},
-                Err(_d)=>{}
-            };       
         }
     });
 
@@ -133,13 +137,24 @@ fn main() {
         
     }
     let mut stdout=std::io::stdout();
-    s2.send(Ok(true));
-    terminal::disable_raw_mode().expect("Could not disable raw mode");
+    s2.send(Ok(true)); 
     stdout.queue(crossterm::cursor::Show).expect("Irgendwas lief falsch");
     WinConsole::output().clear().expect("Irgendwas lief falsch");
     println!("You lost!  |:<(~) Noooooo");
-    let mut buf = [0; 1];
-    io::stdin().read(&mut buf).expect("Failed to read line");
+    println!("Press \"y\" to continue");
+    match r3.recv(){
+        Ok(x)=>{
+            match x{
+                Ok(z)=>{if !z {
+                    break;
+                }},
+                Err(_u)=>{}
+            }},
+        Err(_d)=>{}
+    };
+    
+    terminal::disable_raw_mode().expect("Could not disable raw mode");
+}
 }
 
 struct CleanUp;
