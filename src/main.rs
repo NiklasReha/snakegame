@@ -16,8 +16,8 @@ fn main() {
 loop{
 //Abfrage der Spielfeldparameter un initalisieren des Feldes
     let _clean_up = CleanUp;
-    let weite =20;
-    let hoehe = 20;
+    let weite =27;
+    let hoehe = 27;
     let mut playingfield:Vec<Vec<i32>> = Vec::new();
     println!("Press ENTER to start");
     let mut buf = [0; 1];
@@ -135,7 +135,7 @@ loop{
         ausgabe+=&"|\n\n ".to_string();
         ausgabe+=&"Score: ".to_string();
         ausgabe+=&(head.length-3).to_string();
-        stdout.write(format!("{}", ausgabe).as_bytes()).expect("Irgendwas lief falsch");
+        stdout.write_all(format!("{}", ausgabe).as_bytes()).expect("Irgendwas lief falsch");
         thread::sleep(time::Duration::from_millis(110));
         
     }
@@ -330,18 +330,6 @@ pub fn move_up_multiple_part(){
     assert_eq!(head.length,2);
 
 
-}
-
-#[test]
-pub fn detect_collision_true(){
-    let head=Snakepoint{pos_x:1,pos_y:1,length:2,previous_point:Some(Box::new(Snakepoint{previous_point:None,pos_x:1,pos_y:1,length:1}))};
-    assert_eq!(head.detect_collision(20,20),true);
-}
-
-#[test]
-pub fn detect_collision_false(){
-    let head=Snakepoint{pos_x:1,pos_y:1,length:2,previous_point:Some(Box::new(Snakepoint{previous_point:None,pos_x:2,pos_y:1,length:1}))};
-    assert_eq!(head.detect_collision(20,20),false);
 }
 
 #[test]
