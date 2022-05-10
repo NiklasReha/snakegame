@@ -29,7 +29,7 @@ fn main() {
 
 //Erstellen der Anfangsschlange und des ersten Foods
 
-    let mut head =Snakepoint{pos_x:weite/2, pos_y:hoehe/2,length:4,previous_point:None};
+    let mut head =Snakepoint{pos_x:weite/2, pos_y:hoehe/2,length:3,previous_point:None};
     let mut food=Food{pos_x:16,pos_y:17};
     let mut std=io::stdin();
     WinConsole::output().clear().expect("Irgendwas lief falsch");
@@ -127,9 +127,9 @@ fn main() {
         }
         ausgabe+=&"|\n\n ".to_string();
         ausgabe+=&"Score: ".to_string();
-        ausgabe+=&((head.length-4)/2).to_string();
+        ausgabe+=&(head.length-3).to_string();
         stdout.write(format!("{}", ausgabe).as_bytes()).expect("Irgendwas lief falsch");
-        thread::sleep(time::Duration::from_millis(125));
+        thread::sleep(time::Duration::from_millis(160));
         
     }
     let mut stdout=std::io::stdout();
@@ -191,7 +191,7 @@ impl Snakepoint{
         let mut new_head=Snakepoint{previous_point:None,pos_x:direction.vec_x+self.pos_x,pos_y:direction.vec_y+self.pos_y,length:self.length};
         playingfield[new_head.pos_y as usize][new_head.pos_x as usize] =1;
         if new_head.pos_x ==food.pos_x && new_head.pos_y ==food.pos_y{
-            new_head.length+=2;
+            new_head.length+=1;
             eaten = true;
         }
         new_head.previous_point=substitute.rm_unneeded_and_update(new_head.length);
@@ -231,7 +231,7 @@ impl Snakepoint{
             },
             None=>{return Some(Box::new(iterator));}
         }
-        iterator.previous_point=_safe.rm_unneeded_and_update(self.length-1);
+        iterator.previous_point=_safe.rm_unneeded_and_update(self.length);
         return Some(Box::new(iterator));
     }
     else{
