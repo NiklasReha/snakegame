@@ -45,21 +45,23 @@ loop{
     //Fängt getätigte Inputs ab
     let _child_handle = thread::spawn(move|| {
         let mut direction_thread = MoveDirection{vec_y:0,vec_x:-1};
-        
-        //Gameloop    
+    
         loop{
-            let mut buf = [0; 1];
-            std.read(&mut buf).expect("Failed to read line");
             match r2.try_recv(){
                 Ok(x)=>{
                     match x{
                         Ok(z)=>{if z{
+                            thread::sleep(time::Duration::from_millis(80));
+                            let mut buf = [0; 1];
+                            std.read(&mut buf).expect("Failed to read line");
                             s3.send(Ok(buf[0] as char =='y'));
                             break}},
                         Err(_u)=>{}
                     }},
                 Err(_d)=>{}
-            };       
+            };   
+            let mut buf = [0; 1];
+            std.read(&mut buf).expect("Failed to read line");    
             if buf[0] as char =='w' && direction_thread.vec_y !=1 {
                 direction_thread.vec_x=0;
                 direction_thread.vec_y=-1;
@@ -88,6 +90,7 @@ loop{
 
     WinConsole::output().clear().expect("Irgendwas lief falsch");
 
+    //Gameloop
     loop{  
         match r.try_recv(){
             Ok(x)=>{
@@ -133,7 +136,7 @@ loop{
         ausgabe+=&"Score: ".to_string();
         ausgabe+=&(head.length-3).to_string();
         stdout.write(format!("{}", ausgabe).as_bytes()).expect("Irgendwas lief falsch");
-        thread::sleep(time::Duration::from_millis(160));
+        thread::sleep(time::Duration::from_millis(110));
         
     }
     let mut stdout=std::io::stdout();
@@ -141,6 +144,7 @@ loop{
     stdout.queue(crossterm::cursor::Show).expect("Irgendwas lief falsch");
     WinConsole::output().clear().expect("Irgendwas lief falsch");
     println!("You lost!  |:<(~) Noooooo");
+    thread::sleep(time::Duration::from_millis(150));
     println!("Press \"y\" to continue");
     match r3.recv(){
         Ok(x)=>{
