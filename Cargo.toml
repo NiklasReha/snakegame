@@ -6,8 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-crossbeam-channel="*"
-rand = "*"
-crossterm = "*"
-cursor = "*"
-win32console ="*"
+crossbeam-channel="0.5.6"
+rand = "0.8.5"
+crossterm = "0.25.0"
+cursor = "2.3.0"
+win32console ="0.1.5"
