@@ -250,10 +250,11 @@ impl Snakepoint{
         }
         iterator.previous_point=_safe.rm_unneeded_and_update(self.length);
         Some(Box::new(iterator))
-    }
-    else{
-        None
-    }
+        }
+        else{
+            None
+        }
+
     }
 
 
@@ -335,6 +336,5 @@ pub fn detect_collision_bounds_true(){
     let head=Snakepoint{pos_x:1,pos_y:1,length:2,previous_point:Some(Box::new(Snakepoint{previous_point:None,pos_x:1,pos_y:2,length:1}))};
     assert_eq!(head.detect_collision(1,1),true);
 }
-
 }
 
