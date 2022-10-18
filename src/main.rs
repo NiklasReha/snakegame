@@ -21,7 +21,7 @@ loop{
     let mut playingfield:Vec<Vec<i32>> = Vec::new();
     println!("Press ENTER to start");
     let mut buf = [0; 1];
-    io::stdin().read(&mut buf).expect("Failed to read line");
+    let _r=io::stdin().read(&mut buf).expect("Failed to read line");
 
     for i in 0..hoehe+2{
         playingfield.push(Vec::new());
@@ -53,25 +53,25 @@ loop{
                         Ok(z)=>{if z{
                             thread::sleep(time::Duration::from_millis(80));
                             let mut buf = [0; 1];
-                            std.read(&mut buf).expect("Failed to read line");
-                            s3.send(Ok(buf[0] as char =='y'));
+                            let _r=std.read(&mut buf).expect("Failed to read line");
+                            let _res=s3.send(Ok(buf[0] as char =='y'));
                             break}},
                         Err(_u)=>{}
                     }},
                 Err(_d)=>{}
             };   
             let mut buf = [0; 1];
-            std.read(&mut buf).expect("Failed to read line");    
+            let _r=std.read(&mut buf).expect("Failed to read line");    
             if buf[0] as char =='w' && direction_thread.vec_y !=1 {
                 direction_thread.vec_x=0;
-                direction_thread.vec_y=-1;
+                direction_thread.vec_y-=1;
             }
             else if buf[0] as char =='s' && direction_thread.vec_y !=-1{
                 direction_thread.vec_x=0;
                 direction_thread.vec_y=1;
             }
             else if buf[0] as char =='a'&& direction_thread.vec_x != 1{
-                direction_thread.vec_x=-1;
+                direction_thread.vec_x-=1;
                 direction_thread.vec_y=0;
             }
             else if buf[0] as char =='d' && direction_thread.vec_x !=-1{
@@ -108,39 +108,39 @@ loop{
             break
         }
         let mut ausgabe=String::new();
-        ausgabe+=&"  ".to_string();
+        ausgabe+="  ";
         for _d in 1..playingfield[0].len()-2{
-            ausgabe+=&"___".to_string();
+            ausgabe+="___";
         }
-        ausgabe+=&"\n ".to_string();
+        ausgabe+="\n ";
         for i in 1..playingfield.len()-2{
-            ausgabe+=&"|".to_string();
+            ausgabe+="|";
             for d in 1..playingfield[0].len()-2{
                 if playingfield[i as usize][d as usize] == 1{
-                    ausgabe+=&" O ".to_string();
+                    ausgabe+=" O ";
                 }
                 else if playingfield[i as usize][d as usize] == 2{
-                    ausgabe+=&" 6 ".to_string();
+                    ausgabe+=" 6 ";
                 }
                 else{
-                    ausgabe+=&"   ".to_string();
+                    ausgabe+="   ";
                 }
             }
-            ausgabe+=&"|\n ".to_string();
+            ausgabe+="|\n ";
         }
-        ausgabe+=&"|".to_string();
+        ausgabe+="|";
         for _d in 1..playingfield[0].len()-2{
-            ausgabe+=&"___".to_string();
+            ausgabe+="___";
         }
-        ausgabe+=&"|\n\n ".to_string();
-        ausgabe+=&"Score: ".to_string();
+        ausgabe+="|\n\n ";
+        ausgabe+="Score: ";
         ausgabe+=&(head.length-3).to_string();
-        stdout.write_all(format!("{}", ausgabe).as_bytes()).expect("Irgendwas lief falsch");
+        stdout.write_all(ausgabe.to_string().as_bytes()).expect("Irgendwas lief falsch");
         thread::sleep(time::Duration::from_millis(110));
         
     }
     let mut stdout=std::io::stdout();
-    s2.send(Ok(true)); 
+    let _res=s2.send(Ok(true)); 
     stdout.queue(crossterm::cursor::Show).expect("Irgendwas lief falsch");
     WinConsole::output().clear().expect("Irgendwas lief falsch");
     println!("You lost!  |:<(~) Noooooo");
@@ -194,7 +194,7 @@ impl Snakepoint{
         if self.pos_x < 1 || self.pos_x > weite-1 || self.pos_y < 1 || self.pos_y > hoehe-1{
             return true;
         }
-        return false;
+        false
     }
 
     pub fn move_snek(&mut self,direction:MoveDirection,food:&mut Food,playingfield:&mut Vec<Vec<i32>>)->bool{
@@ -215,28 +215,26 @@ impl Snakepoint{
         }
         new_head.previous_point=substitute.rm_unneeded_and_update(new_head.length);
         *self=new_head;
-        return eaten;
+        eaten
     }
 
     pub fn draw_snake(&self,playingfield:&mut Vec<Vec<i32>>,food:&mut Food,eaten:bool)->bool{
         let mut iterator=self.clone();
         playingfield[iterator.pos_y as usize][iterator.pos_x as usize]=1;
-        loop{
-            match iterator.previous_point{
-                Some(x)=>{iterator=*x;
-                    if playingfield[iterator.pos_y as usize][iterator.pos_x as usize] !=1{
-                    playingfield[iterator.pos_y as usize][iterator.pos_x as usize]=1;
-                }else{
-                    return true
-                }},
-                None=>break
+        while let Some(x) = iterator.previous_point{
+            iterator= *x;
+            if playingfield[iterator.pos_y as usize][iterator.pos_x as usize] !=1{
+                playingfield[iterator.pos_y as usize][iterator.pos_x as usize]=1;
+            }
+            else{
+                return true
             }
         }
         if eaten{
             food.respawn(playingfield.clone());
         }
         playingfield[food.pos_y as usize][food.pos_x as usize]=2;
-        return self.detect_collision((playingfield.len()-2) as i32,(playingfield[0].len()-2) as i32);
+        self.detect_collision((playingfield.len()-2) as i32,(playingfield[0].len()-2) as i32)
     }
 
     pub fn rm_unneeded_and_update(&mut self,length:i32)->Option<Box<Snakepoint>>{
@@ -246,15 +244,15 @@ impl Snakepoint{
         let mut iterator=self.clone();
         match iterator.previous_point{
             Some(x)=>{
-                    _safe=*x.clone();                  
+                    _safe= *x;                  
             },
             None=>{return Some(Box::new(iterator));}
         }
         iterator.previous_point=_safe.rm_unneeded_and_update(self.length);
-        return Some(Box::new(iterator));
+        Some(Box::new(iterator))
     }
     else{
-        return None;
+        None
     }
     }
 
