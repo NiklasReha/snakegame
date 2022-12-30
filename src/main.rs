@@ -108,13 +108,14 @@ loop{
             break
         }
         let mut ausgabe=String::new();
-        ausgabe+="  ";
+        ausgabe+=" ┏";
         for _d in 1..playingfield[0].len()-2{
-            ausgabe+="___";
+            ausgabe+="━━━";
         }
+        ausgabe+="┓";
         ausgabe+="\n ";
         for i in 1..playingfield.len()-2{
-            ausgabe+="|";
+            ausgabe+="┃";
             for d in 1..playingfield[0].len()-2{
                 if playingfield[i as usize][d as usize] == 1{
                     ausgabe+=" O ";
@@ -126,13 +127,13 @@ loop{
                     ausgabe+="   ";
                 }
             }
-            ausgabe+="|\n ";
+            ausgabe+="┃\n ";
         }
-        ausgabe+="|";
+        ausgabe+="┗";
         for _d in 1..playingfield[0].len()-2{
-            ausgabe+="___";
+            ausgabe+="━━━";
         }
-        ausgabe+="|\n\n ";
+        ausgabe+="┛\n\n ";
         ausgabe+="Score: ";
         ausgabe+=&(head.length-3).to_string();
         stdout.write_all(ausgabe.to_string().as_bytes()).expect("Irgendwas lief falsch");
