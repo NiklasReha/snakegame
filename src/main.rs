@@ -8,8 +8,8 @@ use std::{
     time,
 };
 use std::io::stdout;
-use crossterm::{QueueableCommand};
-use std::io::{Write};
+use crossterm::QueueableCommand;
+use std::io::Write;
 use win32console::console::WinConsole;
 
 fn main() {
@@ -117,10 +117,10 @@ loop{
         for i in 1..playingfield.len()-2{
             ausgabe+="┃";
             for d in 1..playingfield[0].len()-2{
-                if playingfield[i as usize][d as usize] == 1{
+                if playingfield[i][d] == 1{
                     ausgabe+=" O ";
                 }
-                else if playingfield[i as usize][d as usize] == 2{
+                else if playingfield[i][d] == 2{
                     ausgabe+=" 6 ";
                 }
                 else{
@@ -198,14 +198,14 @@ impl Snakepoint{
         false
     }
 
-    pub fn move_snek(&mut self,direction:MoveDirection,food:&mut Food,playingfield:&mut Vec<Vec<i32>>)->bool{
+    pub fn move_snek(&mut self,direction:MoveDirection,food:&mut Food,playingfield:&mut [Vec<i32>])->bool{
         let mut substitute=self.clone();
         let hoehe=playingfield.len()-1;
         let weite=playingfield[0].len()-1;
         let mut eaten=false;
-        for i in 0..hoehe{
-            for d in 0..weite{
-                playingfield[i as usize][d as usize]=0;
+        for line in playingfield.iter_mut().take(hoehe){
+            for cell in line.iter_mut().take(weite){
+                *cell = 0;
             }
         }
         let mut new_head=Snakepoint{previous_point:None,pos_x:direction.vec_x+self.pos_x,pos_y:direction.vec_y+self.pos_y,length:self.length};
@@ -219,7 +219,7 @@ impl Snakepoint{
         eaten
     }
 
-    pub fn draw_snake(&self,playingfield:&mut Vec<Vec<i32>>,food:&mut Food,eaten:bool)->bool{
+    pub fn draw_snake(&self,playingfield:&mut [Vec<i32>],food:&mut Food,eaten:bool)->bool{
         let mut iterator=self.clone();
         playingfield[iterator.pos_y as usize][iterator.pos_x as usize]=1;
         while let Some(x) = iterator.previous_point{
@@ -232,7 +232,7 @@ impl Snakepoint{
             }
         }
         if eaten{
-            food.respawn(playingfield.clone());
+            food.respawn(playingfield.to_owned());
         }
         playingfield[food.pos_y as usize][food.pos_x as usize]=2;
         self.detect_collision((playingfield.len()-2) as i32,(playingfield[0].len()-2) as i32)
